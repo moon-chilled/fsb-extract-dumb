@@ -15,12 +15,13 @@ int main(int argc, char **argv) {
 	}
 
 	fseek(fp, 0, SEEK_END);
-	long length = ftell(fp);
-	if (length <= 0) {
+	long ilength = ftell(fp);
+	if (ilength <= 0) {
 		printf("Truncated file?\n");
 		fclose(fp);
 		return 1;
 	}
+	size_t length = ilength;
 
 	rewind(fp);
 
@@ -48,18 +49,27 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	char fbuf[512];
-	snprintf(fbuf, sizeof(fbuf), "%s.fsb", argv[1]);
-	FILE *ofp = fopen(fbuf, "w");
+	size_t l = strlen(argv[1]);
+	char *ofname;
+	if (!strcmp(argv[1]+l-5, ".bank")) {
+		ofname = argv[1];
+		strcpy(ofname+l-4, "fsb");
+	} else {
+		char fbuf[512];
+		snprintf(fbuf, sizeof(fbuf), "%s.fsb", argv[1]);
+		ofname = fbuf;
+	}
+
+	FILE *ofp = fopen(ofname, "w");
 	if (!ofp) {
-		printf("Could not create file '%s'\n", fbuf);
+		printf("Could not create file '%s'\n", ofname);
 		return 1;
 	}
 
 	if (fwrite(buf, 1, length, ofp) != length) {
-		printf("Output failure (%s)\n", fbuf);
+		printf("Output failure (%s)\n", ofname);
 		return 1;
 	}
 
-	printf("All done.  Your file is in '%s'.\n", fbuf);
+	printf("All done!  Your file is in '%s'.\n", ofname);
 }
