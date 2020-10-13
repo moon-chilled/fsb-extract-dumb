@@ -1,0 +1,1 @@
+default: fsb-extract-dumb

@@ -1,0 +1,2 @@
+Dumb tool to extract a single fsb file from an FMOD bank file.
+For optimal results, combine with https://github.com/HearthSim/python-fsb5
