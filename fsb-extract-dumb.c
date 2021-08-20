@@ -39,13 +39,14 @@ int main(int argc, char **argv) {
 	}
 	fclose(fp);
 
-	if (memcmp(buf, "RIFF", 4)) {
+	if (length < 4 || memcmp(buf, "RIFF", 4)) {
 		printf("Warning: file does not start with a RIFF header.  It may not actually be an FMOD bank file.\n");
 	}
 
-	for (; length && memcmp(buf, "FSB5", 4); length--, buf++);
-	if (!length) {
-		printf("Truncated file?\n");
+	int success = 0;
+	for (; length >= 4 && !(success=memcmp(buf, "FSB5", 4)); length--, buf++);
+	if (!success) {
+		printf("Truncated or bad file?\n");
 		return 1;
 	}
 
@@ -55,7 +56,7 @@ int main(int argc, char **argv) {
 		ofname = argv[1];
 		strcpy(ofname+l-4, "fsb");
 	} else {
-		char fbuf[512];
+		static char fbuf[512];
 		snprintf(fbuf, sizeof(fbuf), "%s.fsb", argv[1]);
 		ofname = fbuf;
 	}
